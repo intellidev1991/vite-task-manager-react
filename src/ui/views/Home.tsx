@@ -1,44 +1,38 @@
-import React, { useState } from "react";
-import { useChangeTitle, useObjectState } from "../../core";
-import { AddNewTaskModal, BigOrangeButton, CenterRowBox } from "../components";
-import Button, { ButtonProps } from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import React, { useEffect, useState } from "react";
+import { ITaskItem, useAppContext, useChangeTitle } from "../../core";
+import { AddNewTaskModal, FabButton, TaskItem, TopBar, WelcomeView } from "../components";
 
 interface IHomeProps {}
 
 const Home: React.FC<IHomeProps> = React.memo(({}) => {
   const meta = useChangeTitle("Home");
-  const [state, setState] = useObjectState({
-    showAddNewTaskModal: false,
-  });
+  const { tasks, selectedTask, setSelectedTask, showAddModal, openAddTaskModal, closeAddTaskModal } = useAppContext();
 
-  const onCreateNewTaskButtonHandler = () => {
-    setState({ showAddNewTaskModal: true });
-  };
-  const onAddNewTaskClosed = () => {
-    setState({ showAddNewTaskModal: false });
-  };
-  const onAddNewTaskCreated = () => {
-    setState({ showAddNewTaskModal: false });
-  };
+  useEffect(() => {
+    if (!showAddModal) setSelectedTask(undefined);
+  }, [showAddModal]);
+
+  const onTaskAddOrEditSubmittedHandler = () => closeAddTaskModal();
+  const onViewDoneTaskClickHandler = () => {};
 
   return (
-    <div className="w-full my-h-full">
+    <div className="w-full my-h-full overflow-y-auto pt-4 px-4 md:px-12">
       {meta}
 
-      <div className="w-full h-full p-10 flex flex-col justify-between items-center">
-        <Typography variant="h3">Hello World</Typography>
-        <BigOrangeButton variant="contained" onClick={onCreateNewTaskButtonHandler}>
-          Create Your First Task :)
-        </BigOrangeButton>
-        <div></div>
-      </div>
+      {tasks.length === 0 && <WelcomeView />}
 
-      <AddNewTaskModal
-        show={state.showAddNewTaskModal}
-        onClose={onAddNewTaskClosed}
-        onTaskCreated={onAddNewTaskCreated}
-      />
+      {tasks.length !== 0 && (
+        <div className="">
+          <TopBar onDoneTaskClick={onViewDoneTaskClickHandler} />
+
+          {tasks.map((item, i) => {
+            if (!item.isDone) return <TaskItem data={item} key={i} />;
+          })}
+          <FabButton />
+        </div>
+      )}
+
+      <AddNewTaskModal onSubmitted={onTaskAddOrEditSubmittedHandler} data={selectedTask} />
     </div>
   );
 });

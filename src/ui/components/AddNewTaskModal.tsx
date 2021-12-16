@@ -3,65 +3,123 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { styled, Box } from "@mui/system";
 import ModalUnstyled from "@mui/base/ModalUnstyled";
-
-const StyledModal = styled(ModalUnstyled)`
-  position: fixed;
-  z-index: 1300;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Backdrop = styled("div")`
-  z-index: -1;
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  -webkit-tap-highlight-color: transparent;
-`;
-
-const style = {
-  width: "90%",
-  height: "90%",
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  borderRadius: "50px",
-  p: 5,
-  px: 4,
-  pb: 3,
-};
-
+import { BaseModal } from "./BaseModal";
+import { ITaskItem, useAppContext, useObjectState } from "../../core";
+import { useYupValidation } from "../../core/hooks/useYupValidation";
+import * as yup from "yup";
+import { BigOrangeButton, CenterRowBox, PrioritySelector } from ".";
+import TextField from "@mui/material/TextField";
+import { nanoid } from "nanoid";
 interface IAddNewTaskModalProps {
-  show: boolean;
-  onClose: () => void;
-  onTaskCreated: () => void;
+  onSubmitted: () => void;
+  data?: ITaskItem;
 }
 
-const AddNewTaskModal: React.FC<IAddNewTaskModalProps> = React.memo(({ show, onClose, onTaskCreated }) => {
-  useEffect(() => {}, []);
+const AddNewTaskModal: React.FC<IAddNewTaskModalProps> = React.memo(({ onSubmitted, data }) => {
+  const init_form: ITaskItem = {
+    id: nanoid(),
+    title: "",
+    description: "",
+    gift: "",
+    priority: "Low",
+    isDone: false,
+  };
+
+  //@ts-ignore
+  const [state, setState] = useObjectState<ITaskItem>(init_form);
+  const { clearErrors, hasError, showErrorMessage, validationSync } = useYupValidation();
+  const { addNotify, addTask, editTask, showAddModal, closeAddTaskModal } = useAppContext();
+
+  //Validation schema
+  let schema = yup.object().shape({
+    title: yup.string().required("Title field is required"),
+    description: yup.string().required("Description field is required"),
+    //gift: yup.string().required("This field is required"),
+  });
+
+  useEffect(() => {
+    if (showAddModal) {
+      if (data) {
+        //edit mode
+        console.log("edit", data);
+        setState({ ...data });
+      } else {
+        //new
+        setState({ ...init_form });
+      }
+    } else {
+      clearForm();
+    }
+  }, [showAddModal]);
+
+  const clearForm = () => {
+    setState({ ...init_form });
+    clearErrors();
+  };
+
+  const isFormValid = () => {
+    return validationSync(schema, state);
+  };
+
+  const onSubmit = () => {
+    if (!isFormValid()) return;
+    //-------
+    if (data) {
+      //edit mode
+      editTask({ ...state });
+      addNotify({ id: nanoid(), title: `The Task '${state.title}' has been Edited.` });
+    } else {
+      //add mode
+      addTask({ ...state });
+      addNotify({ id: nanoid(), title: `New Task '${state.title}' has been added.` });
+    }
+    //---
+    clearForm();
+    onSubmitted();
+  };
 
   return (
-    <div>
-      <StyledModal
-        aria-labelledby="unstyled-modal-title"
-        aria-describedby="unstyled-modal-description"
-        open={show}
-        onClose={onClose}
-        BackdropComponent={Backdrop}
+    <BaseModal show={showAddModal} onClose={closeAddTaskModal}>
+      <Box
+        component="form"
+        sx={{
+          "& .MuiTextField-root": { m: 1, width: "100%" },
+        }}
+        noValidate
+        autoComplete="off"
       >
-        <Box sx={style}>
-          <h2 id="unstyled-modal-title">Text in a modal</h2>
-          <p id="unstyled-modal-description">Aliquid amet deserunt earum!</p>
-        </Box>
-      </StyledModal>
-    </div>
+        <TextField
+          error={hasError("title")}
+          label="Title"
+          helperText={showErrorMessage("title")}
+          value={state.title}
+          onChange={(e) => setState({ title: e.target.value })}
+          fullWidth
+        />
+        <TextField
+          error={hasError("description")}
+          label="Description"
+          helperText={showErrorMessage("description")}
+          value={state.description}
+          onChange={(e) => setState({ description: e.target.value })}
+          multiline
+          rows={10}
+          fullWidth
+        />
+        <TextField
+          error={hasError("gift")}
+          label="Gift and KPI for this task :)"
+          helperText={showErrorMessage("gift")}
+          value={state.gift}
+          onChange={(e) => setState({ gift: e.target.value })}
+          fullWidth
+        />
+        <PrioritySelector className="py-7" value={state.priority} onChange={(priority) => setState({ priority })} />
+      </Box>
+      <CenterRowBox>
+        <BigOrangeButton onClick={onSubmit}>{data ? "Edit The Task" : "Add To Tasks"}</BigOrangeButton>
+      </CenterRowBox>
+    </BaseModal>
   );
 });
 

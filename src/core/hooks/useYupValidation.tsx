@@ -28,6 +28,7 @@ const useYupValidation = () => {
     schema: yup.ObjectSchema<ObjectShape, AnyObject, TypeOfShape<ObjectShape>, AssertsShape<ObjectShape>>,
     objectState: any,
   ): boolean => {
+    clearErrors();
     try {
       schema.validateSync(objectState, { abortEarly: false });
       return true;
@@ -41,6 +42,7 @@ const useYupValidation = () => {
     schema: yup.ObjectSchema<ObjectShape, AnyObject, TypeOfShape<ObjectShape>, AssertsShape<ObjectShape>>,
     objectState: any,
   ): void => {
+    clearErrors();
     schema
       .validate(objectState, { abortEarly: false })
       .then(() => {

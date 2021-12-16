@@ -1,5 +1,5 @@
-import { Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { Typography } from "@mui/material";
 import { PRIORITY } from "../../core";
 
 interface IPrioritySelectorProps {

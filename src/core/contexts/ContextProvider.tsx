@@ -1,12 +1,13 @@
 import React, { useState, useMemo, createContext, useCallback } from "react";
 import { INotify, ITaskItem } from "..";
+import { nanoid } from "nanoid";
 
 interface IAppContext {
   selectedTask: ITaskItem | undefined;
   setSelectedTask: (item: ITaskItem | undefined) => void;
   notify: INotify[];
   clearNotify: () => void;
-  addNotify: (item: INotify) => void;
+  addNotify: (title: string) => void;
   tasks: ITaskItem[];
   addTask: (item: ITaskItem) => void;
   deleteTask: (item: ITaskItem) => void;
@@ -17,6 +18,12 @@ interface IAppContext {
   showAddModal: boolean;
   openAddTaskModal: () => void;
   closeAddTaskModal: () => void;
+  showDoneTasksModal: boolean;
+  openDoneTaskModal: () => void;
+  closeDoneTaskModal: () => void;
+  showTaskViewModal: boolean;
+  openTaskViewModal: () => void;
+  closeTaskViewModal: () => void;
 }
 
 const defaultState: IAppContext = {
@@ -35,6 +42,12 @@ const defaultState: IAppContext = {
   showAddModal: false,
   openAddTaskModal: () => {},
   closeAddTaskModal: () => {},
+  showDoneTasksModal: false,
+  openDoneTaskModal: () => {},
+  closeDoneTaskModal: () => {},
+  showTaskViewModal: false,
+  openTaskViewModal: () => {},
+  closeTaskViewModal: () => {},
 };
 
 const AppContext = createContext<IAppContext>(defaultState);
@@ -42,8 +55,11 @@ const AppContext = createContext<IAppContext>(defaultState);
 interface IContextProviderProps {}
 
 const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
-  const [selectedTask, setSelectedTask] = useState<ITaskItem | undefined>(undefined);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showDoneTasksModal, setShowDoneTasksModal] = useState<boolean>(false);
+  const [showTaskViewModal, setShowTaskViewModal] = useState<boolean>(false);
+
+  const [selectedTask, setSelectedTask] = useState<ITaskItem | undefined>(undefined);
   const [notify, setNotify] = useState<INotify[]>([]);
   const [tasks, setTasks] = useState<ITaskItem[]>([]);
 
@@ -51,18 +67,15 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
   const openAddTaskModal = useCallback(() => setShowAddModal(true), [showAddModal]);
   const closeAddTaskModal = useCallback(() => setShowAddModal(false), [showAddModal]);
 
+  const openDoneTaskModal = useCallback(() => setShowDoneTasksModal(true), [showDoneTasksModal]);
+  const closeDoneTaskModal = useCallback(() => setShowDoneTasksModal(false), [showDoneTasksModal]);
+
+  const openTaskViewModal = useCallback(() => setShowTaskViewModal(true), [showTaskViewModal]);
+  const closeTaskViewModal = useCallback(() => setShowTaskViewModal(false), [showTaskViewModal]);
   //--- Tasks
   const addTask = useCallback(
     (item: ITaskItem) => {
       setTasks([...tasks, item]);
-    },
-    [tasks],
-  );
-
-  const deleteTask = useCallback(
-    (item: ITaskItem) => {
-      let t = tasks.filter((i) => i.id !== item.id);
-      setTasks(t);
     },
     [tasks],
   );
@@ -88,6 +101,14 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
     [tasks],
   );
 
+  const deleteTask = useCallback(
+    (item: ITaskItem) => {
+      let t = tasks.filter((i) => i.id !== item.id);
+      setTasks(t);
+    },
+    [tasks],
+  );
+
   const deleteTaskById = useCallback(
     (id: string) => {
       let t = tasks.filter((i) => i.id !== id);
@@ -106,8 +127,8 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
 
   //--- Notify
   const addNotify = useCallback(
-    (item: INotify) => {
-      setNotify([...notify, item]);
+    (title: string) => {
+      setNotify([...notify, { id: nanoid(), title }]);
     },
     [notify],
   );
@@ -134,8 +155,14 @@ const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
       showAddModal,
       openAddTaskModal,
       closeAddTaskModal,
+      showDoneTasksModal,
+      openDoneTaskModal,
+      closeDoneTaskModal,
+      showTaskViewModal,
+      openTaskViewModal,
+      closeTaskViewModal,
     }),
-    [selectedTask, notify, tasks, showAddModal],
+    [selectedTask, notify, tasks, showAddModal, showDoneTasksModal, showTaskViewModal],
   );
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

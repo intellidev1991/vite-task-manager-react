@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { styled, Box } from "@mui/system";
+import React from "react";
+import { styled } from "@mui/system";
 import ModalUnstyled from "@mui/base/ModalUnstyled";
 
 const StyledModal = styled(ModalUnstyled)`
@@ -47,7 +47,7 @@ const BaseModal: React.FC<IBaseModalProps> = React.memo(({ show, onClose, childr
         onClose={onClose}
         BackdropComponent={Backdrop}
       >
-        <div style={style} className="bg-white p-5 overflow-y-auto overflow-x-hidden">
+        <div style={style} className="bg-gray-200 p-5 my-hide-scroll-but-keep-working overflow-x-hidden">
           {children}
         </div>
       </StyledModal>

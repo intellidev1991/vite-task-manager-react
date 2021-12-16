@@ -2,6 +2,7 @@ import React from "react";
 import { Typography } from "@mui/material";
 import { CircleIndicator, NormalButton } from ".";
 import { ITaskItem, useAppContext } from "../../core";
+import { truncate } from "lodash";
 
 interface ITaskItemProps {
   data: ITaskItem;
@@ -39,24 +40,24 @@ const TaskItem: React.FC<ITaskItemProps> = React.memo(
     return (
       <div
         onClick={itemClickHandler}
-        className={`bg-white w-full flex flex-row justify-between items-center border border-black rounded-xl px-5 py-4 shadow-md mb-4 hover:bg-gray-300 ${
+        className={`bg-white w-full flex flex-row justify-between items-center flex-wrap sm:flex-nowrap gap-4 border border-black rounded-xl px-5 py-4 shadow-md mb-4 hover:bg-gray-300 ${
           activeBodyClick ? "hover:cursor-pointer" : ""
         } ${className}`}
       >
         <div className="flex flex-col justify-start items-start">
           <Typography variant="h4">{data.title}</Typography>
           <Typography variant="body1" color={(e) => e.palette.grey[500]} className="to-gray-400 mt-4">
-            {data.description}
+            {truncate(data.description, { length: 100 })}
           </Typography>
         </div>
         <div className="flex flex-col justify-start items-end">
           <CircleIndicator priority={data.priority} active showLabel="before" onClick={() => {}} />
           {showActions && (
             <div className="flex flex-row justify-start items-center gap-3 mt-4">
-              <NormalButton variant="contained" color="warning" onClick={doneTaskHandler}>
+              <NormalButton variant="contained" color="warning" className="w-36" onClick={doneTaskHandler}>
                 Done Task
               </NormalButton>
-              <NormalButton variant="contained" color={"success"} onClick={editTaskHandler}>
+              <NormalButton variant="contained" color={"success"} className="w-36" onClick={editTaskHandler}>
                 Edit Task
               </NormalButton>
             </div>

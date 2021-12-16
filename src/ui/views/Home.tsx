@@ -17,7 +17,7 @@ const Home: React.FC<IHomeProps> = React.memo(({}) => {
   const { tasks } = useAppContext();
 
   return (
-    <div className="w-full my-h-full overflow-y-auto pt-4 px-4 md:px-12">
+    <div className="w-full my-h-full overflow-y-auto pt-6 px-4 md:px-24">
       {meta}
       {tasks.length === 0 && <WelcomeView />}
       {tasks.length !== 0 && (

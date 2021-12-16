@@ -48,10 +48,6 @@ const AddNewTaskModal: React.FC<IAddNewTaskModalProps> = React.memo(({}) => {
     }
   }, [showAddModal]);
 
-  useEffect(() => {
-    if (state.title || state.description) isFormValid();
-  }, [state.description, state.title]);
-
   const isFormValid = () => {
     return validationSync(schema, state);
   };

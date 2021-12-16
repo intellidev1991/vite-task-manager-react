@@ -16,7 +16,7 @@ const FabButton: React.FC<IFabButtonProps> = React.memo(({ className }) => {
     openAddTaskModal();
   };
   return (
-    <div className="fixed bottom-10 right-10">
+    <div className="fixed bottom-6 right-6">
       <Box sx={{ "& > :not(style)": { m: 1 } }}>
         <Fab
           style={{ backgroundColor: "#DD2C00", color: "#FFF" }}

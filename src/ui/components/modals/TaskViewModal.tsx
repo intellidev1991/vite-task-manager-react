@@ -48,8 +48,10 @@ const TaskViewModal: React.FC<ITaskViewModalProps> = React.memo(({}) => {
               </Typography>
               <div></div>
             </div>
-            <p className="px-4 md:px-32 mt-10 text-justify font-normal flex-1">{selectedTask.description}</p>
-            <div className="flex flex-col md:flex-row justify-around items-center gap-2 mt-4">
+            <p className="px-4 md:px-32 mt-10 text-justify font-normal max-h-full overflow-y-scroll flex-1">
+              {selectedTask.description}
+            </p>
+            <div className="flex flex-col md:flex-row justify-around items-center gap-2 mt-6 mb-4">
               <NormalButton variant="contained" color={"warning"} className="w-40" onClick={editTaskHandler}>
                 Edit Task
               </NormalButton>

@@ -1,19 +1,34 @@
-import React, { useState, useMemo, createContext } from "react";
+import React, { useState, useMemo, createContext, useContext } from "react";
 
-const AppContext = createContext({});
+interface INotify {
+  id: string;
+  title: string;
+}
+interface IAppContext {
+  notify: INotify[];
+  setNotify: (item: INotify[]) => void;
+}
+
+const defaultState: IAppContext = {
+  notify: [],
+  setNotify: () => {},
+};
+
+const AppContext = createContext<IAppContext>(defaultState);
 
 interface IContextProviderProps {}
 
 const ContextProvider: React.FC<IContextProviderProps> = ({ children }) => {
-  const [authUser, setAuthUser] = useState(null);
+  const [notify, setNotify] = useState<INotify[]>([]);
+
   const value = useMemo(
     () => ({
-      authUser,
-      setAuthUser,
+      notify,
+      setNotify,
     }),
-    [authUser],
+    [notify],
   );
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
-export { ContextProvider };
+export { ContextProvider, AppContext };

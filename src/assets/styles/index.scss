@@ -3,3 +3,7 @@
 @tailwind utilities;
 
 @import "./modules/PageNotFound";
+
+.my-h-full {
+  height: calc(100vh - 64px);
+}
